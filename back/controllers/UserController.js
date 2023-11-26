@@ -1,8 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { validationResult } = require('express-validator');
+const {UserModel} = require('../models');
 
 const token = (id) => jwt.sign(
   { _id: id },
@@ -12,14 +11,10 @@ const token = (id) => jwt.sign(
 
 const register = async(req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(errors.array());
-    }
     const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
-    const doc = new User({
+    const doc = new UserModel({
       email: req.body.email,
       fullName: req.body.fullName,
       avatarUrl: req.body.avatarUrl,
@@ -38,7 +33,7 @@ const register = async(req, res) => {
 
 const login = async(req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await UserModel.findOne({ email: req.body.email });
     console.log('useruser', user);
     if (!user) {
       return res.status(404).json({
@@ -64,7 +59,7 @@ const login = async(req, res) => {
 
 const getMe = async(req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const user = await UserModel.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({ message: 'Пользователь не найден' });

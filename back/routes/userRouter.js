@@ -1,13 +1,17 @@
-const Router = require('express')
-const { registerValidation } = require('../validations/auth');
+const Router = require('express');
+const {
+  registerValidation,
+  loginValidation
+} = require('../validations');
 const checkAuth = require('../middleware/checkAuth');
+const handleValidationErrors = require('../middleware/handleValidationErrors');
 
-const userController = require('../controllers/userController')
-const router = new Router()
+const UserController = require('../controllers/UserController');
+const router = new Router();
 
-router.post('/register', registerValidation, userController.register)
-router.post('/login', userController.login)
-router.get('/me',checkAuth , userController.getMe)
+router.post('/register', registerValidation, handleValidationErrors, UserController.register);
+router.post('/login', loginValidation, handleValidationErrors, UserController.login);
+router.get('/me', checkAuth, UserController.getMe);
 
 
-module.exports = router
+module.exports = router;
